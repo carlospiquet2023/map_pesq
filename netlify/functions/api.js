@@ -2,7 +2,12 @@ const fs = require('fs');
 const path = require('path');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyBBotzZ05fCpwvRaPJ0Sv1lnIOHtH5FhSI';
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+
+if (!GEMINI_API_KEY) {
+    throw new Error('GEMINI_API_KEY não configurada');
+}
+
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 
 // Dados hardcoded para Netlify Functions (temporário)
