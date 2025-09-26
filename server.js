@@ -66,6 +66,41 @@ app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, 'admin.html'));
 });
 
+// Rota para análise de dados com IA
+app.post('/api/analyze', async (req, res) => {
+    try {
+        const { question } = req.body;
+        console.log('Pergunta recebida:', question);
+
+        // Ler dados da pesquisa
+        const data = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+        console.log('Dados carregados:', data.length, 'registros');
+
+        // Análise básica sem IA por enquanto (problema com API key)
+        let analysis = '';
+
+        if (question.toLowerCase().includes('quantas') || question.toLowerCase().includes('total')) {
+            analysis = `Total de respostas na pesquisa: ${data.length}`;
+        } else if (question.toLowerCase().includes('idade') || question.toLowerCase().includes('média')) {
+            const ageMap = { '18-24': 21, '25-34': 29.5, '35-44': 39.5, '45+': 50 };
+            const avgAge = data.reduce((sum, d) => sum + (ageMap[d.idade] || 0), 0) / data.length;
+            analysis = `Idade média dos respondentes: ${Math.round(avgAge)} anos`;
+        } else if (question.toLowerCase().includes('cidade') || question.toLowerCase().includes('cidades')) {
+            const cities = [...new Set(data.map(d => d.cidade))];
+            analysis = `Número de cidades únicas: ${cities.length}`;
+        } else {
+            analysis = `Dados disponíveis: ${data.length} respostas. Faça perguntas sobre idade, cidades, interesses educacionais, etc.`;
+        }
+
+        console.log('Análise concluída:', analysis);
+
+        res.json({ success: true, analysis });
+    } catch (error) {
+        console.error('Erro na análise:', error);
+        res.status(500).json({ success: false, message: 'Erro ao analisar dados' });
+    }
+});
+
 // Rota para servir o site principal (fallback para index.html)
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
