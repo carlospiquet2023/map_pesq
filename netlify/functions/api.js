@@ -5,7 +5,7 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyBBotzZ05fCpwvRaPJ0Sv1lnIOHtH5FhSI';
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 
-const DATA_FILE = path.join(__dirname, '../../survey-data.json');
+const DATA_FILE = path.join(process.cwd(), 'survey-data.json');
 
 exports.handler = async (event, context) => {
     // Headers CORS
