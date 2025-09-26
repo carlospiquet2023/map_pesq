@@ -302,7 +302,7 @@ function initSurveyForm() {
 
         try {
             // Enviar dados para o backend
-            const response = await fetch('http://localhost:3000/api/survey', {
+            const response = await fetch('https://maphistoriapesq-production.up.railway.app/api/survey', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
