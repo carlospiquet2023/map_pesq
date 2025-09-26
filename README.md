@@ -71,6 +71,13 @@ Aplicação web educacional interativa que apresenta os principais pontos histó
 - **Gradientes Autorais**: Criados especificamente para o projeto
 - **Componentes Originais**: Desenvolvidos do zero
 
+### 📊 **Sistema de Pesquisa Educacional**
+- **Coleta Anônima**: Formulário que aparece após o vídeo introdutório
+- **Dados Estruturados**: Coleta faixa etária, escolaridade, localização e interesses
+- **Backend Integrado**: API REST para armazenamento seguro dos dados
+- **Painel Admin**: Dashboard separado para análise dos dados coletados
+- **Prevenção de Duplicatas**: Sistema que impede respostas múltiplas por usuário
+
 ## 🎯 **Resultado**
 
 ✅ **Interface Profissional** com design autoral único  
@@ -83,3 +90,47 @@ Aplicação web educacional interativa que apresenta os principais pontos histó
 ---
 
 **🏛️ Explore o centro histórico do Rio com uma experiência visual completamente renovada!**
+
+## 🚀 **Instalação e Uso**
+
+### Pré-requisitos
+- Node.js (versão 14 ou superior)
+- NPM ou Yarn
+
+### Instalação
+```bash
+# Clonar o repositório
+git clone <url-do-repositorio>
+cd mapa-historico-rj
+
+# Instalar dependências
+npm install
+```
+
+### Executar o Projeto
+```bash
+# Iniciar servidor backend
+npm start
+
+# Ou para desenvolvimento (com nodemon)
+npm run dev
+```
+
+### Acesso
+- **Site Principal**: http://localhost:3000
+- **Painel Admin**: http://localhost:3000/admin
+
+### Funcionalidades da Pesquisa Educacional
+1. Após assistir o vídeo introdutório, um formulário aparece
+2. Coleta dados anônimos sobre demanda educacional
+3. Dados são enviados para o backend e armazenados em JSON
+4. Painel admin mostra estatísticas e visualizações dos dados
+5. Sistema previne respostas múltiplas usando localStorage
+
+### Estrutura dos Dados Coletados
+- Faixa etária
+- Escolaridade
+- Cidade e bairro
+- Interesse educacional
+- Urgência de início
+- Timestamp e ID único

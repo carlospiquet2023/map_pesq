@@ -76,6 +76,67 @@
         </div>
     </div>
 
+    <!-- ===== FORMULÁRIO DE PESQUISA EDUCACIONAL ===== -->
+    <div class="survey-overlay" id="surveyOverlay">
+        <div class="survey-container">
+            <button class="close-survey" id="closeSurvey" title="Fechar">&times;</button>
+            <h2>EduRadar - Pesquisa de Demanda Educacional</h2>
+            <p>Para que possamos melhorar cada vez mais, agradecemos o seu apoio respondendo esta pesquisa anônima!</p>
+            <form id="surveyForm">
+                <div class="form-group">
+                    <label for="idade">Faixa Etária:</label>
+                    <select id="idade" name="idade" required>
+                        <option value="">Selecione...</option>
+                        <option value="18-24">18 a 24 anos</option>
+                        <option value="25-34">25 a 34 anos</option>
+                        <option value="35-44">35 a 44 anos</option>
+                        <option value="45+">45 anos ou mais</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="escolaridade">Escolaridade:</label>
+                    <select id="escolaridade" name="escolaridade" required>
+                        <option value="">Selecione...</option>
+                        <option value="medio-incompleto">Ensino Médio Incompleto</option>
+                        <option value="medio-completo">Ensino Médio Concluído</option>
+                        <option value="superior-incompleto">Ensino Superior Incompleto</option>
+                        <option value="superior-completo">Ensino Superior Concluído</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="cidade">Cidade:</label>
+                    <input type="text" id="cidade" name="cidade" placeholder="Ex: São Paulo" required>
+                </div>
+                <div class="form-group">
+                    <label for="bairro">Bairro:</label>
+                    <input type="text" id="bairro" name="bairro" placeholder="Ex: Pinheiros" required>
+                </div>
+                <div class="form-group">
+                    <label for="interesse">Interesse Educacional:</label>
+                    <select id="interesse" name="interesse" required>
+                        <option value="">Selecione...</option>
+                        <option value="ensino-tecnico">Ensino Técnico</option>
+                        <option value="graduacao">Graduação</option>
+                        <option value="pos-graduacao">Pós-Graduação</option>
+                        <option value="cursos-livres">Cursos Livres</option>
+                        <option value="idiomas">Idiomas</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="inicio">Quando gostaria de iniciar?</label>
+                    <select id="inicio" name="inicio" required>
+                        <option value="">Selecione...</option>
+                        <option value="imediato">Imediatamente</option>
+                        <option value="3-meses">Nos próximos 3 meses</option>
+                        <option value="6-meses">Nos próximos 6 meses</option>
+                        <option value="1-ano">No próximo ano</option>
+                    </select>
+                </div>
+                <button type="submit" class="submit-btn">ENVIAR RESPOSTA</button>
+            </form>
+        </div>
+    </div>
+
     <!-- ===== TELA DE CARREGAMENTO ===== -->
     <!-- Overlay fullscreen com animação enquanto o mapa carrega -->
     <div class="loading" id="loading">
@@ -187,6 +248,12 @@
                     <i class="fas fa-search search-icon"></i>
                     <input type="text" class="search-input" placeholder="Digite o nome de um local..." id="searchInput">
                 </div>
+                
+                <!-- Botão de Pesquisa Educacional -->
+                <button class="btn btn-survey" id="surveyButton" style="width: 100%; margin-top: 10px;">
+                    <i class="fas fa-poll"></i>
+                    Pesquisa Educacional
+                </button>
             </div>
 
             <!-- === SEÇÃO DE CARTEIRINHA === -->

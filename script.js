@@ -68,7 +68,7 @@ function initVideoIntro() {
         video.muted = false;
     }
     
-    // Função para remover overlay
+    // Função para remover overlay (simplificada)
     const removeOverlay = () => {
         overlay.classList.add('fade-out');
         setTimeout(() => {
@@ -235,7 +235,99 @@ function initVideoIntro() {
 }
 
 //=============================================================================
-// 📱 PWA & OTIMIZAÇÕES MOBILE
+// � PESQUISA EDUCACIONAL
+//=============================================================================
+
+/**
+ * INICIALIZAÇÃO DO FORMULÁRIO DE PESQUISA
+ * Gerencia o formulário de pesquisa educacional
+ */
+function initSurveyForm() {
+    const surveyForm = document.getElementById('surveyForm');
+    const surveyOverlay = document.getElementById('surveyOverlay');
+    const surveyButton = document.getElementById('surveyButton');
+    const closeSurvey = document.getElementById('closeSurvey');
+
+    if (!surveyForm || !surveyOverlay || !surveyButton) return;
+
+    // Verifica se já respondeu
+    if (localStorage.getItem('surveyCompleted') === 'true') {
+        surveyButton.style.display = 'none';
+        return;
+    }
+
+    // Função para mostrar modal
+    const showSurvey = () => {
+        surveyOverlay.style.display = 'flex';
+        surveyOverlay.classList.remove('fade-out');
+    };
+
+    // Função para esconder modal
+    const hideSurvey = () => {
+        surveyOverlay.classList.add('fade-out');
+        setTimeout(() => {
+            surveyOverlay.style.display = 'none';
+        }, 300);
+    };
+
+    // Botão de abrir pesquisa
+    surveyButton.addEventListener('click', showSurvey);
+
+    // Botão de fechar (X)
+    if (closeSurvey) {
+        closeSurvey.addEventListener('click', hideSurvey);
+    }
+
+    // Fechar ao clicar fora do modal
+    surveyOverlay.addEventListener('click', (e) => {
+        if (e.target === surveyOverlay) {
+            hideSurvey();
+        }
+    });
+
+    // Envio do formulário
+    surveyForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(surveyForm);
+        const data = {
+            idade: formData.get('idade'),
+            escolaridade: formData.get('escolaridade'),
+            cidade: formData.get('cidade'),
+            bairro: formData.get('bairro'),
+            interesse: formData.get('interesse'),
+            inicio: formData.get('inicio'),
+            timestamp: new Date().toISOString()
+        };
+
+        try {
+            // Enviar dados para o backend
+            const response = await fetch('http://localhost:3000/api/survey', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                // Marcar como respondido
+                localStorage.setItem('surveyCompleted', 'true');
+                surveyButton.style.display = 'none';
+                alert('Agradecemos o seu apoio! Seus dados nos ajudarão a melhorar as oportunidades educacionais.');
+                hideSurvey();
+            } else {
+                alert('Erro ao enviar resposta. Tente novamente.');
+            }
+        } catch (error) {
+            console.error('Erro:', error);
+            alert('Erro de conexão. Tente novamente mais tarde.');
+        }
+    });
+}
+
+//=============================================================================
+// �📱 PWA & OTIMIZAÇÕES MOBILE
 //=============================================================================
 
 /**
@@ -246,6 +338,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Inicializar intro de vídeo
     initVideoIntro();
+
+    // Inicializar formulário de pesquisa
+    initSurveyForm();
 
     // ================= Acessibilidade e Tela Cheia =================
     initAccessibility();

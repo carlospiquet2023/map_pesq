@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Admin - Pesquisa Educacional</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #FFD700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .charts-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .chart-card h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .data-table {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Painel de Controle - Pesquisa Educacional</h1>
+
+        <div id="loading" class="loading">Carregando dados...</div>
+        <div id="error" class="error" style="display: none;"></div>
+
+        <div id="content" style="display: none;">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="total-responses">0</div>
+                    <div class="stat-label">Total de Respostas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="unique-cities">0</div>
+                    <div class="stat-label">Cidades Únicas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="avg-age">0</div>
+                    <div class="stat-label">Idade Média</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="most-interest">-</div>
+                    <div class="stat-label">Interesse Mais Comum</div>
+                </div>
+            </div>
+
+            <div class="charts-container">
+                <div class="chart-card">
+                    <h3>Distribuição por Faixa Etária</h3>
+                    <canvas id="ageChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>Interesses Educacionais</h3>
+                    <canvas id="interestChart"></canvas>
+                </div>
+            </div>
+
+            <div class="data-table">
+                <table id="responses-table">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Idade</th>
+                            <th>Escolaridade</th>
+                            <th>Cidade</th>
+                            <th>Bairro</th>
+                            <th>Interesse</th>
+                            <th>Início</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let ageChart, interestChart;
+
+        async function loadData() {
+            try {
+                const response = await fetch('/api/survey');
+                const data = await response.json();
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+
+                processData(data);
+            } catch (error) {
+                console.error('Erro ao carregar dados:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error').textContent = 'Erro ao carregar dados. Tente novamente.';
+            }
+        }
+
+        function processData(data) {
+            // Estatísticas básicas
+            document.getElementById('total-responses').textContent = data.length;
+
+            const cities = [...new Set(data.map(d => d.cidade))];
+            document.getElementById('unique-cities').textContent = cities.length;
+
+            // Idade média
+            const ageMap = { '18-24': 21, '25-34': 29.5, '35-44': 39.5, '45+': 50 };
+            const avgAge = data.reduce((sum, d) => sum + (ageMap[d.idade] || 0), 0) / data.length;
+            document.getElementById('avg-age').textContent = Math.round(avgAge);
+
+            // Interesse mais comum
+            const interests = data.reduce((acc, d) => {
+                acc[d.interesse] = (acc[d.interesse] || 0) + 1;
+                return acc;
+            }, {});
+            const mostInterest = Object.keys(interests).reduce((a, b) => interests[a] > interests[b] ? a : b, '');
+            const interestLabels = {
+                'ensino-tecnico': 'Ensino Técnico',
+                'graduacao': 'Graduação',
+                'pos-graduacao': 'Pós-Graduação',
+                'cursos-livres': 'Cursos Livres',
+                'idiomas': 'Idiomas'
+            };
+            document.getElementById('most-interest').textContent = interestLabels[mostInterest] || mostInterest;
+
+            // Gráfico de idade
+            const ageCounts = data.reduce((acc, d) => {
+                acc[d.idade] = (acc[d.idade] || 0) + 1;
+                return acc;
+            }, {});
+
+            if (ageChart) ageChart.destroy();
+            ageChart = new Chart(document.getElementById('ageChart'), {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(ageCounts).map(k => k + ' anos'),
+                    datasets: [{
+                        data: Object.values(ageCounts),
+                        backgroundColor: ['#FFD700', '#FFA500', '#FF8C00', '#FF6347']
+                    }]
+                }
+            });
+
+            // Gráfico de interesses
+            const interestCounts = data.reduce((acc, d) => {
+                acc[d.interesse] = (acc[d.interesse] || 0) + 1;
+                return acc;
+            }, {});
+
+            if (interestChart) interestChart.destroy();
+            interestChart = new Chart(document.getElementById('interestChart'), {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(interestCounts).map(k => interestLabels[k] || k),
+                    datasets: [{
+                        data: Object.values(interestCounts),
+                        backgroundColor: '#FFD700'
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Tabela de respostas
+            const tableBody = document.getElementById('table-body');
+            tableBody.innerHTML = '';
+
+            data.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).forEach(response => {
+                const row = tableBody.insertRow();
+                row.insertCell(0).textContent = new Date(response.timestamp).toLocaleDateString('pt-BR');
+                row.insertCell(1).textContent = response.idade;
+                row.insertCell(2).textContent = response.escolaridade;
+                row.insertCell(3).textContent = response.cidade;
+                row.insertCell(4).textContent = response.bairro;
+                row.insertCell(5).textContent = interestLabels[response.interesse] || response.interesse;
+                row.insertCell(6).textContent = response.inicio;
+            });
+        }
+
+        // Carregar dados ao carregar a página
+        loadData();
+
+        // Atualizar dados a cada 30 segundos
+        setInterval(loadData, 30000);
+    </script>
+</body>
+</html>
