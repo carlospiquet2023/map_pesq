@@ -1,6 +1,28 @@
 # 🗺️ MAPA DA HISTÓRIA - Centro Histórico do Rio de Janeiro
 
-## ⚖️ IMPORTANTE - TODOS OS DIREITOS RESERVADOS
+## ⚖️ IMPO### 📊 **Sistema de Pesquisa Educacional**
+- **Coleta Anônima**: Formulário modal após vídeo introdutório
+- **Dados Estruturados**: Coleta faixa etária, escolaridade, localização e interesses
+- **Backend Integrado**: API REST para armazenamento seguro dos dados
+- **Painel Admin**: Dashboard separado para análise dos dados coletados
+- **Prevenção de Duplicatas**: Sistema que impede respostas múltiplas por usuário
+
+## 🌐 **URLs Separadas**
+
+### Site Principal
+- **URL**: `https://seudominio.com/`
+- **Conteúdo**: Mapa histórico interativo + formulário de pesquisa
+
+### Painel Admin
+- **URL**: `https://seudominio.com/admin`
+- **Conteúdo**: Dashboard com estatísticas e gráficos dos dados coletados
+- **Acesso**: Qualquer pessoa pode acessar (dados públicos)
+
+### API
+- **Endpoint**: `https://seudominio.com/api/survey`
+- **Método**: POST (para enviar dados) / GET (para obter dados)
+
+--- - TODOS OS DIREITOS RESERVADOS
 
 ```
 © 2024 Carlos Antonio de Oliveira Piquet
