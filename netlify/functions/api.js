@@ -57,10 +57,15 @@ exports.handler = async (event, context) => {
 
         if (event.httpMethod === 'POST' && event.path === '/.netlify/functions/api/analyze') {
             // Rota para análise de dados com IA
+            console.log('Iniciando análise de dados...');
+            console.log('GEMINI_API_KEY presente:', !!process.env.GEMINI_API_KEY);
+
             const { question } = JSON.parse(event.body);
+            console.log('Pergunta recebida:', question);
 
             // Usar dados em memória
             const data = surveyData;
+            console.log('Dados disponíveis:', data.length, 'registros');
 
             // Preparar prompt para a IA
             const prompt = `Você é um analista de dados de alto nível especializado em estatísticas educacionais.
@@ -78,11 +83,15 @@ Instruções:
 - Os dados são para base de um censo educacional.
 - Responda em português brasileiro.`;
 
+            console.log('Prompt preparado, chamando Gemini...');
+
             // Chamar a API do Gemini
             const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
             const result = await model.generateContent(prompt);
             const response = await result.response;
             const analysis = response.text();
+
+            console.log('Análise concluída com sucesso');
 
             return {
                 statusCode: 200,
@@ -116,11 +125,19 @@ Instruções:
         };
 
     } catch (error) {
-        console.error('Erro:', error);
+        console.error('Erro detalhado:', error);
+        console.error('Stack trace:', error.stack);
+        console.error('Mensagem do erro:', error.message);
+
         return {
             statusCode: 500,
             headers,
-            body: JSON.stringify({ success: false, message: 'Erro interno do servidor' })
+            body: JSON.stringify({
+                success: false,
+                message: 'Erro interno do servidor',
+                error: error.message,
+                type: error.constructor.name
+            })
         };
     }
 };
