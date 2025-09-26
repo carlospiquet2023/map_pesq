@@ -5,7 +5,22 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyBBotzZ05fCpwvRaPJ0Sv1lnIOHtH5FhSI';
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 
-const DATA_FILE = path.join(process.cwd(), 'survey-data.json');
+// Dados hardcoded para Netlify Functions (temporário)
+const DEFAULT_DATA = [
+  {
+    "idade": "18-24",
+    "escolaridade": "medio-incompleto",
+    "cidade": "Belford Roxo",
+    "bairro": "Santa Amélia",
+    "interesse": "ensino-tecnico",
+    "inicio": "3-meses",
+    "timestamp": "2025-09-26T12:57:39.209Z",
+    "id": "1758891459259",
+    "ip": "::1"
+  }
+];
+
+let surveyData = [...DEFAULT_DATA];
 
 exports.handler = async (event, context) => {
     // Headers CORS
@@ -28,11 +43,10 @@ exports.handler = async (event, context) => {
     try {
         if (event.httpMethod === 'GET' && event.path === '/.netlify/functions/api/survey') {
             // Rota para obter dados da pesquisa
-            const data = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
             return {
                 statusCode: 200,
                 headers,
-                body: JSON.stringify(data)
+                body: JSON.stringify(surveyData)
             };
         }
 
@@ -40,8 +54,8 @@ exports.handler = async (event, context) => {
             // Rota para análise de dados com IA
             const { question } = JSON.parse(event.body);
 
-            // Ler dados da pesquisa
-            const data = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+            // Usar dados em memória
+            const data = surveyData;
 
             // Preparar prompt para a IA
             const prompt = `Você é um analista de dados de alto nível especializado em estatísticas educacionais.
@@ -74,30 +88,19 @@ Instruções:
 
         if (event.httpMethod === 'POST' && event.path === '/.netlify/functions/api/survey') {
             // Rota para receber dados da pesquisa
-            const surveyData = JSON.parse(event.body);
+            const surveyDataInput = JSON.parse(event.body);
 
-            // Ler dados existentes
-            let existingData = [];
-            try {
-                existingData = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
-            } catch (error) {
-                console.log('Arquivo de dados vazio ou corrompido, iniciando novo');
-            }
-
-            // Adicionar novo dado
-            existingData.push({
-                ...surveyData,
+            // Adicionar novo dado (dados não persistem em Netlify Functions)
+            surveyData.push({
+                ...surveyDataInput,
                 id: Date.now().toString(),
                 timestamp: new Date().toISOString()
             });
 
-            // Salvar dados
-            fs.writeFileSync(DATA_FILE, JSON.stringify(existingData, null, 2));
-
             return {
                 statusCode: 200,
                 headers,
-                body: JSON.stringify({ success: true, message: 'Dados salvos com sucesso' })
+                body: JSON.stringify({ success: true, message: 'Dados salvos com sucesso (não persistente)' })
             };
         }
 
